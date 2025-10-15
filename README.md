@@ -1,6 +1,6 @@
 ## Sigma-Weighted Shuffle
 
-A lightweight ComfyUI model patch that locally permutes K/V tokens inside attention, with a sigma-aware schedule, entropy-gated strength, and a KL-based safety check, to diversify focus without destabilizing generation. 
+A lightweight [ComfyUI](https://github.com/comfyanonymous/ComfyUI) model patch that locally permutes K/V tokens inside attention, with a sigma-aware schedule, entropy-gated strength, and a KL-based safety check, to diversify focus without destabilizing generation. 
 
 ## Mathematics
 
@@ -36,3 +36,4 @@ Downscale by 1 / (1 + λₖₗ · Dₖₗ(A₁ ∥ A₀)) and softly fade for la
    Add **“Sigma-Weighted Shuffle”** (category: `model_patches`) before your sampler; connect the `MODEL` input and set `intensity` (0–1).
 
    Recommended start: `intensity = 0.5`.
+
