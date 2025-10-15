@@ -4,7 +4,7 @@ A lightweight [ComfyUI](https://github.com/comfyanonymous/ComfyUI) model patch t
 
 ## Resume
 
-All operations are built upon the attention maps. With input qkv and sigma, calculate the sigma weight and attention entropy. Using high entropy as a guide of when to shuffle and calculate kl divergence, output tuned qkv. When entropy is low, output original qkv. Since it's linear algebra, there's virtually no overhead.
+All operations are built upon the attention maps. With input qkv and sigma, calculate the sigma weight and attention entropy. Using high entropy as a guide of when to shuffle and calculate kl divergence, output tuned qkv. When entropy is low, output original qkv. Since it's linear algebra, it's **fast**.
 
 ## Math
 
@@ -52,5 +52,6 @@ https://imgsli.com/NDIyMTcz
 https://imgsli.com/NDIyMTc0
 
 https://imgsli.com/NDIyMTc1
+
 
 
