@@ -26,14 +26,18 @@ Downscale by 1 / (1 + λₖₗ · Dₖₗ(A₁ ∥ A₀)) and softly fade for la
 ## Installation
 
 1. **Clone the node**
+
 	Go to the custom_nodes directory.
 	Run this command.
 	```bash
 	git clone https://github.com/geltz/sws
 	```
-2. **Restart ComfyUI.**
-3. **Use the node**
+3. **Restart ComfyUI.**
+
+5. **Use the node**
+
    Add **“Sigma-Weighted Shuffle”** (category: `model_patches`) before your sampler; connect the `MODEL` input and set `intensity` (0–1).
 
    Recommended start: `intensity = 0.5`.
+
 
