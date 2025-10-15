@@ -2,7 +2,7 @@
 
 A lightweight [ComfyUI](https://github.com/comfyanonymous/ComfyUI) model patch that locally permutes K/V tokens inside attention, with a sigma-aware schedule, entropy-gated strength, and a KL-based safety check, to diversify focus without destabilizing generation. 
 
-## Short Math
+## Resume
 
 All operations are built upon the attention maps. With input qkv and sigma, calculate the sigma weight and attention entropy. Using high entropy as a guide of when to shuffle and calculate kl divergence, output tuned qkv. When entropy is low, output original qkv. Since it's linear algebra, there's virtually no overhead.
 
@@ -52,4 +52,5 @@ https://imgsli.com/NDIyMTcz
 https://imgsli.com/NDIyMTc0
 
 https://imgsli.com/NDIyMTc1
+
 
