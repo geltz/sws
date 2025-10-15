@@ -4,7 +4,7 @@ A lightweight [ComfyUI](https://github.com/comfyanonymous/ComfyUI) model patch t
 
 ## Short Math
 
-All operations are built upon the attention maps. With input qkv and sigma it calculates the sigma weight and attention entropy. Then by using high entropy as a guide of when to shuffle and calculate kl divergence, it then outputs tuned qkv. When entropy is low, it outputs original qkv. Since it's linear algebra, there's basically no overhead.
+All operations are built upon the attention maps. With input qkv and sigma, calculate the sigma weight and attention entropy. Using high entropy as a guide of when to shuffle and calculate kl divergence, output tuned qkv. When entropy is low, output original qkv. Since it's linear algebra, there's virtually no overhead.
 
 ## Math
 
@@ -43,6 +43,7 @@ Downscale by 1 / (1 + λₖₗ · Dₖₗ(A₁ ∥ A₀)) and softly fade for la
    Add **“Sigma-Weighted Shuffle”** (category: `model_patches`) before your sampler; connect the `MODEL` input and set `intensity` (0–1).
 
    Recommended start: `intensity = 0.5`.
+
 
 
 
