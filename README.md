@@ -9,6 +9,7 @@ All operations are built upon the attention maps. With input qkv and sigma, calc
 ## Math
 
 Let σ ∈ [σₘᵢₙ, σₘₐₓ].
+
 **Progress & weight.**
 u = clamp( (ln σ − ln σₘᵢₙ) / (ln σₘₐₓ − ln σₘᵢₙ), 0, 1 ), 
 w = sigmoid(α(u − ½)) / sigmoid(α/2).
@@ -51,3 +52,4 @@ https://imgsli.com/NDIyMTcz
 https://imgsli.com/NDIyMTc0
 
 https://imgsli.com/NDIyMTc1
+
