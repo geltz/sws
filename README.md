@@ -44,6 +44,13 @@ Downscale by 1 / (1 + λₖₗ · Dₖₗ(A₁ ∥ A₀)) and softly fade for la
 
    Recommended start: `intensity = 0.5`.
 
+## Results
+
+https://imgsli.com/NDIyMTcz
+https://imgsli.com/NDIyMTc0
+https://imgsli.com/NDIyMTc1
+https://imgsli.com/NDIyMTc2
+https://imgsli.com/NDIyMTg0
 
 
 
