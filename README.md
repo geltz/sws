@@ -1,6 +1,6 @@
 # Sigma-Weighted Shuffle
 
-SWS is a plug-and-play [ComfyUI](https://github.com/comfyanonymous/ComfyUI) model patch that improves UNet diffusion by gently reordering attention tokens rather than changing weights. It mixes keys and values through learnable, locality-aware transports so structure stays stable while textures sharpen and clutter reduces. The node uses four ingredients: a log-sigma-aware schedule that decides when to act; a multi-scale optimal-transport blend (scales 2, 4, 8) that preserves both edges and layout; a KL-budgeted mixer that automatically limits how far keys can drift; and an exponential-moving-average momentum that prevents flicker across steps. Late in sampling it fades key mixing to zero and keeps only a light value mix, preserving detail without breaking composition. Effects you should see: crisper edges, cleaner textures, fewer mushy regions, and more stable frame-to-frame behavior at the same prompt and seed. 
+SWS is a plug-and-play [ComfyUI](https://github.com/comfyanonymous/ComfyUI) model patch that improves UNet diffusion by gently reordering attention tokens rather than changing weights. It mixes keys and values through learnable, locality-aware transports so structure stays stable while textures sharpen and clutter reduces. The node uses four ingredients: a log-sigma-aware schedule that decides when to act; a multi-scale optimal-transport blend (scales 2, 4, 8) that preserves both edges and layout; a KL-budgeted mixer that automatically limits how far keys can drift; and an exponential-moving-average momentum that prevents flicker across steps. Late in sampling it fades key mixing to zero and keeps only a light value mix, preserving detail without breaking composition. Stabilizes frame-to-frame behavior at the same prompt and seed. 
 
 # Mathematics
 
@@ -46,5 +46,6 @@ Multi-scale transport preserves both local edges (small scales) and global layou
    Add **“Sigma-Weighted Shuffle”** (category: `model_patches`) before your sampler; connect the `MODEL` input and set `intensity` (0–1).
 
    Recommended strength: `intensity = 0.5`.
+
 
 
