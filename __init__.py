@@ -18,10 +18,11 @@ class SWS:
         smin=0.28
         alpha=4.0
         wnd_max=8
+        beta_mom=0.8
         log_smin=torch.log(torch.tensor(smin))
         log_smax=torch.log(torch.tensor(smax))
         log_range=log_smax-log_smin
-        state={"calls":0,"cycle":64}
+        state={"calls":0,"cycle":64,"Pk_prev":None,"Pv_prev":None,"Pk_shape":None,"Pv_shape":None}
         def get_u_and_w(extra):
             sig=None
             idx=None
@@ -120,7 +121,8 @@ class SWS:
             H_norm=((H_mean-H_min)/(H_max-H_min)).squeeze()
             H_norm=torch.nan_to_num(H_norm,nan=0.0).clamp(0,1)
             H_scalar=H_norm.mean()
-            w_u=0.5*(1.0+torch.cos(torch.tensor(torch.pi*(u-0.5),device=A.device))).clamp(0,1)
+            u_prime=((torch.tensor(u)-0.0)/(1.0-0.0)).clamp(0,1)
+            w_u=(u_prime*(1.0-u_prime))*4.0
             a=float(intensity)*float(H_scalar)*float(w_u)
             return max(0.0,min(a,1.0))
         def sinkhorn_from_2d(T,H,W,local_r,device,tau,iters):
@@ -136,6 +138,11 @@ class SWS:
             S=S*mask+(-1e4)*(1.0-mask)
             P=(S/float(max(tau,1e-6))).softmax(dim=-1)
             for _ in range(iters):
+                P=P/(P.sum(dim=-1,keepdim=True).clamp_min(1e-8))
+                P=P/(P.sum(dim=0,keepdim=True).clamp_min(1e-8))
+            return P
+        def rebalance(P,steps=2):
+            for _ in range(steps):
                 P=P/(P.sum(dim=-1,keepdim=True).clamp_min(1e-8))
                 P=P/(P.sum(dim=0,keepdim=True).clamp_min(1e-8))
             return P
@@ -157,11 +164,24 @@ class SWS:
             P1=P1.clamp_min(eps).float()
             KL=(P1*(P1.log()-P0.log())).sum(dim=-1).mean(dim=(-1,-2))
             return KL.mean().item()
+        def bsearch_alpha_k(q,k,A0,k_perm,a_max,kl_cap,steps=7):
+            lo=0.0; hi=float(max(0.0,min(1.0,a_max)))
+            best=0.0
+            for _ in range(steps):
+                mid=0.5*(lo+hi)
+                k_try=(1.0-mid)*k+mid*k_perm
+                _,A1=baseline_attn(q,k_try)
+                if kl_guard(A1,A0) > kl_cap:
+                    hi=mid
+                else:
+                    best=mid
+                    lo=mid
+            return best
         def sws(q,k,v,extra):
             if q.dim()==4: q=q.reshape(q.shape[0]*q.shape[1], q.shape[2], q.shape[3])
             if k.dim()==4: k=k.reshape(k.shape[0]*k.shape[1], k.shape[2], k.shape[3])
             if v.dim()==4: v=v.reshape(v.shape[0]*v.shape[1], v.shape[2], v.shape[3])
-            u,w=get_u_and_w(extra)
+            u,_=get_u_and_w(extra)
             tau = 1.0 + 1.0 * (1.0 - u)
             scale=(1.0/float(tau))**0.5
             q=q*scale
@@ -180,22 +200,27 @@ class SWS:
             local_rv=max(1,int(0.5*r_base_v))
             Pk=sinkhorn_from_2d(Tk,Hk,Wk,local_rk,device=k.device,tau=0.3,iters=2)
             Pv=sinkhorn_from_2d(Tv,Hv,Wv,local_rv,device=v.device,tau=0.3,iters=2)
+            if state["Pk_prev"] is not None and state["Pk_shape"]==(Tk,Hk,Wk):
+                Pk=rebalance(beta_mom*state["Pk_prev"]+(1.0-beta_mom)*Pk,steps=2)
+            if state["Pv_prev"] is not None and state["Pv_shape"]==(Tv,Hv,Wv):
+                Pv=rebalance(beta_mom*state["Pv_prev"]+(1.0-beta_mom)*Pv,steps=2)
+            state["Pk_prev"]=Pk.detach()
+            state["Pv_prev"]=Pv.detach()
+            state["Pk_shape"]=(Tk,Hk,Wk)
+            state["Pv_shape"]=(Tv,Hv,Wv)
             k_perm=apply_P(k,Pk)
             v_perm=apply_P(v,Pv)
-            rho=0.1
-            a_k=min(1.0,max(0.0,0.25*rho*a))
-            k_mix=(1.0-a_k)*k+a_k*k_perm
-            _,A1=baseline_attn(q,k_mix)
-            lam_kl=1.00
-            klv=kl_guard(A1,A0)
-            a2=a/(1.0+lam_kl*klv)
-            if u>0.6:
-                g=0.5*(1.0+torch.cos(torch.tensor(math.pi*((u-0.75)/0.25),device=v.device))).item()
-                a2=a2*g
-            a2=max(0.0,min(1.0,a2))
-            a2_k=min(1.0,max(0.0,0.10*rho*a2))
-            a_v=min(1.0,max(0.0,0.25*a2))
-            k_final=(1.0-a2_k)*k+a2_k*k_perm
+            kl_cap=0.08*(1.0-u)+0.01
+            a_k_max=0.25*a
+            a_v_base=0.6*a
+            u_stop=0.75
+            if u>=u_stop:
+                a_k=0.0
+            else:
+                a_k=bsearch_alpha_k(q,k,A0,k_perm,a_k_max,kl_cap,steps=7)
+            v_gate=0.5+0.5*(1.0-u)
+            a_v=max(0.0,min(1.0,a_v_base*v_gate))
+            k_final=(1.0-a_k)*k+a_k*k_perm
             v_final=(1.0-a_v)*v+a_v*v_perm
             return q,k_final,v_final
         m.set_model_attn2_patch(sws)
