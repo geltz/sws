@@ -17,7 +17,7 @@ class SWS:
         smax=25.0
         smin=0.28
         alpha=4.0
-        wnd_max=16
+        wnd_max=8
         beta_mom=0.8
         log_smin=torch.log(torch.tensor(smin))
         log_smax=torch.log(torch.tensor(smax))
@@ -210,10 +210,10 @@ class SWS:
             state["Pv_shape"]=(Tv,Hv,Wv)
             k_perm=apply_P(k,Pk)
             v_perm=apply_P(v,Pv)
-            kl_cap=0.05*(1.0-u)+0.005
-            a_k_max=0.9*a
+            kl_cap=0.08*(1.0-u)+0.01
+            a_k_max=0.3*a
             a_v_base=0.6*a
-            u_stop=0.1
+            u_stop=0.75
             if u>=u_stop:
                 a_k=0.0
             else:
