@@ -1,10 +1,6 @@
 ## Sigma-Weighted Shuffle
 
-A lightweight [ComfyUI](https://github.com/comfyanonymous/ComfyUI) model patch that locally permutes K/V tokens inside attention, with a sigma-aware schedule, entropy-gated strength, and a KL-based safety check, to diversify focus without destabilizing generation. 
-
-## Resume
-
-All operations are built upon the attention maps. With input qkv and sigma, calculate the sigma weight and attention entropy. Using high entropy as a guide of when to shuffle and calculate kl divergence, output tuned qkv. When entropy is low, output original qkv. Since it's linear algebra, it's **fast**.
+A lightweight [ComfyUI](https://github.com/comfyanonymous/ComfyUI) model patch that locally permutes K/V tokens inside attention, with a sigma-aware schedule, entropy-gated strength, and a KL-based safety check, to diversify focus without destabilizing generation. All operations are built upon the attention maps. With input qkv and sigma, calculate the sigma weight and attention entropy. Using high entropy as a guide of when to shuffle and calculate kl divergence, output tuned qkv. When entropy is low, output original qkv.
 
 ## Math
 
@@ -44,3 +40,4 @@ Downscale by 1 / (1 + λₖₗ · Dₖₗ(A₁ ∥ A₀)) and softly fade for la
    Add **“Sigma-Weighted Shuffle”** (category: `model_patches`) before your sampler; connect the `MODEL` input and set `intensity` (0–1).
 
    Recommended strength: `intensity = 0.5`.
+
