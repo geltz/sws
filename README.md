@@ -40,20 +40,17 @@ Multi-scale transport preserves both local edges (small scales) and global layou
 
 ## Install
 
-1. **Clone the node**
+Clone this repo into your `custom_nodes` directory.
+```bash
+git clone https://github.com/geltz/vectorpusher
+```
+Restart [ComfyUI](https://github.com/comfyanonymous/ComfyUI).
 
-	Go to the custom_nodes directory.
-	Run this command.
-	```bash
-	git clone https://github.com/geltz/sws
-	```
-3. **Restart [ComfyUI](https://github.com/comfyanonymous/ComfyUI).**
+## Usage
 
-5. **Use the node**
+Add **“Sigma-Weighted Shuffle”** (category: `model_patches`) before your sampler; connect the `MODEL` input and set `intensity` (0–1).
 
-   Add **“Sigma-Weighted Shuffle”** (category: `model_patches`) before your sampler; connect the `MODEL` input and set `intensity` (0–1).
-
-   Recommended strength: `intensity = 0.5`.
+Recommended strength: `intensity = 0.5`.
 
 
 
