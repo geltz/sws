@@ -34,7 +34,7 @@ k ← (1 − α_k) k + α_k k_perm
 v ← (1 − a_v) v + a_v v_perm
 q is rescaled by a mild temperature derived from u to keep logits well-conditioned. Attention then proceeds with A = softmax((q kᵀ) / sqrt(D)) and output = A v.
 
-**Why it works**
+**TLDR**
 
 Multi-scale transport preserves both local edges (small scales) and global layout (large scales). The KL budget keeps the new attention close to the original where the model is confident, avoiding artifacts. EMA maintains coherence across steps. Late-step value anneal adds texture without disturbing the final composition, yielding sharper, cleaner images with stable structure.
 
@@ -51,6 +51,7 @@ Restart [ComfyUI](https://github.com/comfyanonymous/ComfyUI).
 Add **“Sigma-Weighted Shuffle”** (category: `model_patches`) before your sampler; connect the `MODEL` input and set `intensity` (0–1).
 
 Recommended strength: `intensity = 0.5`.
+
 
 
 
